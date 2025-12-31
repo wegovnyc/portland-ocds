@@ -1,0 +1,26 @@
+# Environment variables
+.env
+*.env
+
+# Secrets and Keys
+*.pem
+*.key
+auth.ini
+openprocurement.api/auth.ini
+openprocurement.api/tests/auth.ini
+
+# Logs
+*.log
+*.log.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Node
+node_modules/
+dist/
+
+# OCDS Data
+OCDS 2025.10.06/

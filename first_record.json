@@ -1,0 +1,914 @@
+{
+  "ocid": "ocds-ptecst-118001",
+  "releases": [
+    {
+      "ocid": "ocds-ptecst-118001",
+      "date": "2015-04-29T00:00:00-07:00",
+      "buyer": {
+        "id": "US_OR-PDX-BS-ABBR-PSSRP",
+        "name": "CITYWIDE PROJECTS - OMF"
+      },
+      "language": "en",
+      "parties": [
+        {
+          "id": "US_OR-PDX-BS-ABBR-PSSRP",
+          "name": "CITYWIDE PROJECTS - OMF",
+          "identifier": {
+            "id": "PSSRP",
+            "scheme": "US_OR-PDX-BS-ABBR",
+            "legalName": "CITYWIDE PROJECTS - OMF"
+          },
+          "contactPoint": {
+            "name": "MONICA BORDEN-OOLEY"
+          },
+          "roles": [
+            "buyer",
+            "procuringEntity",
+            "payer"
+          ]
+        },
+        {
+          "id": "US_OR-PDX-BS-VNBR-M0206287",
+          "name": "MOURI Tech LLC",
+          "identifier": {
+            "id": "109191",
+            "scheme": "US_OR-PDX-SAP-SID",
+            "legalName": "MOURI TECH LLC"
+          },
+          "additionalIdentifiers": [
+            {
+              "id": "M0206287",
+              "scheme": "US_OR-PDX-BS-VNBR",
+              "legalName": "MOURI Tech LLC"
+            },
+            {
+              "id": "Vendor Nbr",
+              "scheme": "US_OR-PDX-BS-VNBR",
+              "legalName": "MOURI Tech LLC"
+            }
+          ],
+          "roles": [
+            "tenderer",
+            "supplier",
+            "payee"
+          ]
+        }
+      ],
+      "tender": {
+        "id": "118001",
+        "title": "IMPLEMENTATION OF SAP HCM PROCESSES AND FORMS FUNCTIONALITY",
+        "status": "complete",
+        "identifiers": [
+          {
+            "id": "00000001",
+            "scheme": "US_OR-PDX-BS-BIDNBR"
+          }
+        ],
+        "procuringEntity": {
+          "id": "US_OR-PDX-BS-ABBR-PSSRP",
+          "name": "CITYWIDE PROJECTS - OMF"
+        },
+        "value": {
+          "amount": 400000.0,
+          "currency": "USD"
+        },
+        "mainProcurementCategory": "services",
+        "awardCriteria": "ratedCriteria",
+        "tenderPeriod": {
+          "startDate": "2015-04-29T00:00:00-07:00",
+          "endDate": "2015-11-06T00:00:00-08:00"
+        },
+        "enquiryPeriod": {
+          "endDate": "2015-11-06T00:00:00-08:00"
+        },
+        "awardPeriod": {
+          "startDate": "2015-11-06T00:00:00-08:00"
+        },
+        "tenderers": [
+          {
+            "id": "US_OR-PDX-BS-VNBR-M0206287",
+            "name": "MOURI Tech LLC"
+          }
+        ]
+      },
+      "awards": [
+        {
+          "id": "30004792",
+          "title": "SAP HCM P&F SVCS",
+          "status": "active",
+          "date": "2015-11-06T00:00:00-08:00",
+          "value": {
+            "amount": 391600.0,
+            "currency": "USD"
+          },
+          "suppliers": [
+            {
+              "id": "US_OR-PDX-BS-VNBR-M0206287",
+              "name": "MOURI Tech LLC"
+            }
+          ],
+          "contractPeriod": {
+            "startDate": "2015-09-23T00:00:00-07:00",
+            "endDate": "2016-12-31T00:00:00-08:00"
+          },
+          "documents": [
+            {
+              "id": "187079",
+              "documentType": "awardNotice",
+              "title": "\"City Ordinance #187079 authorizing the contract\"",
+              "description": "\"To obtain the document please visit https://efiles.portlandoregon.gov/ and search for the Ordinance number \"187079\"",
+              "format": "application/pdf",
+              "language": "en"
+            }
+          ]
+        }
+      ],
+      "contracts": [
+        {
+          "id": "30004792",
+          "awardID": "30004792",
+          "title": "SAP HCM P&F SVCS",
+          "description": "IMPLEMENTATION OF SAP HCM PROCESSES AND FORMS",
+          "status": "terminated",
+          "period": {
+            "startDate": "2015-09-23T00:00:00-07:00",
+            "endDate": "2016-12-31T00:00:00-08:00"
+          },
+          "value": {
+            "amount": 487280.0,
+            "currency": "USD"
+          },
+          "items": [
+            {
+              "id": "22176949-10",
+              "description": "SAP HCM P&F SVCS",
+              "classification": {
+                "id": "92000",
+                "scheme": "NIGP",
+                "description": "DATA PROCESSING, PROGRAMMING, & SOFTWARE SERVICES"
+              },
+              "quantity": 391600.0,
+              "unit": {
+                "id": "M4",
+                "scheme": "UNCEFACT",
+                "name": "monetary value",
+                "value": {
+                  "amount": 1.0,
+                  "currency": "USD"
+                }
+              }
+            },
+            {
+              "id": "22188989-10",
+              "description": "Invoice # COP-SE_Apr16-1",
+              "classification": {
+                "id": "96200",
+                "scheme": "NIGP",
+                "description": "MISCELLANEOUS SERVICES"
+              },
+              "quantity": 4960.0,
+              "unit": {
+                "id": "M4",
+                "scheme": "UNCEFACT",
+                "name": "monetary value",
+                "value": {
+                  "amount": 1.0,
+                  "currency": "USD"
+                }
+              }
+            },
+            {
+              "id": "22189084-10",
+              "description": "Invoice # COP - PH3 - Apr16",
+              "classification": {
+                "id": "96200",
+                "scheme": "NIGP",
+                "description": "MISCELLANEOUS SERVICES"
+              },
+              "quantity": 75680.0,
+              "unit": {
+                "id": "M4",
+                "scheme": "UNCEFACT",
+                "name": "monetary value",
+                "value": {
+                  "amount": 1.0,
+                  "currency": "USD"
+                }
+              }
+            },
+            {
+              "id": "22192213-10",
+              "description": "Consulting Services for SAP HCM Forms",
+              "classification": {
+                "id": "96200",
+                "scheme": "NIGP",
+                "description": "MISCELLANEOUS SERVICES"
+              },
+              "quantity": 2560.0,
+              "unit": {
+                "id": "M4",
+                "scheme": "UNCEFACT",
+                "name": "monetary value",
+                "value": {
+                  "amount": 1.0,
+                  "currency": "USD"
+                }
+              }
+            },
+            {
+              "id": "22199888-10",
+              "description": "Mouri tech - Consulting Svcs.",
+              "classification": {
+                "id": "96100",
+                "scheme": "NIGP",
+                "description": "MISCELLANEOUS PROFESSIONAL SERVICES"
+              },
+              "quantity": 78320.0,
+              "unit": {
+                "id": "M4",
+                "scheme": "UNCEFACT",
+                "name": "monetary value",
+                "value": {
+                  "amount": 1.0,
+                  "currency": "USD"
+                }
+              }
+            }
+          ],
+          "milestones": [
+            {
+              "id": "187079-30004792-CA",
+              "title": "Contract Administrator",
+              "type": "approval",
+              "description": "Contract Administrator (the Procurement Services \"Buyer\") approved the contract in SAP. The contract is awating approval from others to execute the contract. The contract is not finalized until the City Auditor approves the contract, indicated by \"AU.\"",
+              "code": "CA",
+              "status": "met"
+            },
+            {
+              "id": "187079-30004792-AU",
+              "title": "City Auditor",
+              "type": "approval",
+              "description": "City Auditor approved the contract in SAP. The contract is finalized, as indicated by \"AU.\"",
+              "code": "AU",
+              "status": "met"
+            }
+          ],
+          "implementation": {
+            "transactions": [
+              {
+                "id": "22176949-10",
+                "date": "2016-12-31T00:00:00-08:00",
+                "value": {
+                  "amount": 325760.0,
+                  "currency": "USD"
+                },
+                "payer": {
+                  "id": "US_OR-PDX-BS-ABBR-PSSRP",
+                  "name": "CITYWIDE PROJECTS - OMF"
+                },
+                "payee": {
+                  "id": "US_OR-PDX-BS-VNBR-M0206287",
+                  "name": "MOURI Tech LLC"
+                },
+                "relatedImplementationMilestone": {
+                  "id": "PO-22176949-10",
+                  "title": "SAP HCM P&F SVCS"
+                },
+                "purchaseOrderId": "22176949"
+              },
+              {
+                "id": "22188989-10",
+                "date": "2016-06-30T00:00:00-07:00",
+                "value": {
+                  "amount": 4960.0,
+                  "currency": "USD"
+                },
+                "payer": {
+                  "id": "US_OR-PDX-BS-ABBR-PSSRP",
+                  "name": "CITYWIDE PROJECTS - OMF"
+                },
+                "payee": {
+                  "id": "US_OR-PDX-BS-VNBR-M0206287",
+                  "name": "MOURI Tech LLC"
+                },
+                "relatedImplementationMilestone": {
+                  "id": "PO-22188989-10",
+                  "title": "Invoice # COP-SE_Apr16-1"
+                },
+                "purchaseOrderId": "22188989"
+              },
+              {
+                "id": "22189084-10",
+                "date": "2016-06-30T00:00:00-07:00",
+                "value": {
+                  "amount": 75680.0,
+                  "currency": "USD"
+                },
+                "payer": {
+                  "id": "US_OR-PDX-BS-ABBR-PSSRP",
+                  "name": "CITYWIDE PROJECTS - OMF"
+                },
+                "payee": {
+                  "id": "US_OR-PDX-BS-VNBR-M0206287",
+                  "name": "MOURI Tech LLC"
+                },
+                "relatedImplementationMilestone": {
+                  "id": "PO-22189084-10",
+                  "title": "Invoice # COP - PH3 - Apr16"
+                },
+                "purchaseOrderId": "22189084"
+              },
+              {
+                "id": "22192213-10",
+                "date": "2017-06-30T00:00:00-07:00",
+                "value": {
+                  "amount": 2560.0,
+                  "currency": "USD"
+                },
+                "payer": {
+                  "id": "US_OR-PDX-BS-ABBR-PSSRP",
+                  "name": "CITYWIDE PROJECTS - OMF"
+                },
+                "payee": {
+                  "id": "US_OR-PDX-BS-VNBR-M0206287",
+                  "name": "MOURI Tech LLC"
+                },
+                "relatedImplementationMilestone": {
+                  "id": "PO-22192213-10",
+                  "title": "Consulting Services for SAP HCM Forms"
+                },
+                "purchaseOrderId": "22192213"
+              },
+              {
+                "id": "22199888-10",
+                "date": "2017-06-30T00:00:00-07:00",
+                "value": {
+                  "amount": 78320.0,
+                  "currency": "USD"
+                },
+                "payer": {
+                  "id": "US_OR-PDX-BS-ABBR-PSSRP",
+                  "name": "CITYWIDE PROJECTS - OMF"
+                },
+                "payee": {
+                  "id": "US_OR-PDX-BS-VNBR-M0206287",
+                  "name": "MOURI Tech LLC"
+                },
+                "relatedImplementationMilestone": {
+                  "id": "PO-22199888-10",
+                  "title": "Mouri tech - Consulting Svcs."
+                },
+                "purchaseOrderId": "22199888"
+              }
+            ],
+            "milestones": [
+              {
+                "id": "PO-22176949-10",
+                "title": "SAP HCM P&F SVCS",
+                "type": "payment",
+                "dueDate": "2016-12-31T00:00:00-08:00",
+                "status": "partiallyMet",
+                "purchaseOrderId": "22176949"
+              },
+              {
+                "id": "PO-22188989-10",
+                "title": "Invoice # COP-SE_Apr16-1",
+                "type": "payment",
+                "dueDate": "2016-06-30T00:00:00-07:00",
+                "status": "met",
+                "purchaseOrderId": "22188989"
+              },
+              {
+                "id": "PO-22189084-10",
+                "title": "Invoice # COP - PH3 - Apr16",
+                "type": "payment",
+                "dueDate": "2016-06-30T00:00:00-07:00",
+                "status": "met",
+                "purchaseOrderId": "22189084"
+              },
+              {
+                "id": "PO-22192213-10",
+                "title": "Consulting Services for SAP HCM Forms",
+                "type": "payment",
+                "dueDate": "2017-06-30T00:00:00-07:00",
+                "status": "met",
+                "purchaseOrderId": "22192213"
+              },
+              {
+                "id": "PO-22199888-10",
+                "title": "Mouri tech - Consulting Svcs.",
+                "type": "payment",
+                "dueDate": "2017-06-30T00:00:00-07:00",
+                "status": "met",
+                "purchaseOrderId": "22199888"
+              }
+            ],
+            "purchaseOrders": [
+              {
+                "id": "22176949",
+                "title": "SAP HCM P&F SVCS",
+                "executionPeriod": {
+                  "startDate": "2015-10-19T00:00:00-07:00",
+                  "endDate": "2016-12-31T00:00:00-08:00"
+                }
+              },
+              {
+                "id": "22188989",
+                "title": "Invoice # COP-SE_Apr16-1",
+                "executionPeriod": {
+                  "startDate": "2016-05-10T00:00:00-07:00",
+                  "endDate": "2016-06-30T00:00:00-07:00"
+                }
+              },
+              {
+                "id": "22189084",
+                "title": "Invoice # COP - PH3 - Apr16",
+                "executionPeriod": {
+                  "startDate": "2016-05-11T00:00:00-07:00",
+                  "endDate": "2016-06-30T00:00:00-07:00"
+                }
+              },
+              {
+                "id": "22192213",
+                "title": "Consulting Services for SAP HCM Forms",
+                "executionPeriod": {
+                  "startDate": "2016-06-13T00:00:00-07:00",
+                  "endDate": "2017-06-30T00:00:00-07:00"
+                }
+              },
+              {
+                "id": "22199888",
+                "title": "Mouri tech - Consulting Svcs.",
+                "executionPeriod": {
+                  "startDate": "2016-10-10T00:00:00-07:00",
+                  "endDate": "2017-06-30T00:00:00-07:00"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "initiationType": "tender",
+      "tag": [
+        "tender",
+        "award",
+        "contract",
+        "implementation"
+      ],
+      "id": "767da263b7192e5ce2b09c9a5809918488268dc5f1145b61546ae387c8f360b2"
+    }
+  ],
+  "compiledRelease": {
+    "tag": [
+      "compiled"
+    ],
+    "id": "ocds-ptecst-118001-2015-04-29T00:00:00-07:00",
+    "date": "2015-04-29T00:00:00-07:00",
+    "ocid": "ocds-ptecst-118001",
+    "buyer": {
+      "id": "US_OR-PDX-BS-ABBR-PSSRP",
+      "name": "CITYWIDE PROJECTS - OMF"
+    },
+    "language": "en",
+    "parties": [
+      {
+        "id": "US_OR-PDX-BS-ABBR-PSSRP",
+        "name": "CITYWIDE PROJECTS - OMF",
+        "identifier": {
+          "id": "PSSRP",
+          "scheme": "US_OR-PDX-BS-ABBR",
+          "legalName": "CITYWIDE PROJECTS - OMF"
+        },
+        "contactPoint": {
+          "name": "MONICA BORDEN-OOLEY"
+        },
+        "roles": [
+          "buyer",
+          "procuringEntity",
+          "payer"
+        ]
+      },
+      {
+        "id": "US_OR-PDX-BS-VNBR-M0206287",
+        "name": "MOURI Tech LLC",
+        "identifier": {
+          "id": "109191",
+          "scheme": "US_OR-PDX-SAP-SID",
+          "legalName": "MOURI TECH LLC"
+        },
+        "additionalIdentifiers": [
+          {
+            "id": "M0206287",
+            "scheme": "US_OR-PDX-BS-VNBR",
+            "legalName": "MOURI Tech LLC"
+          },
+          {
+            "id": "Vendor Nbr",
+            "scheme": "US_OR-PDX-BS-VNBR",
+            "legalName": "MOURI Tech LLC"
+          }
+        ],
+        "roles": [
+          "tenderer",
+          "supplier",
+          "payee"
+        ]
+      }
+    ],
+    "tender": {
+      "id": "118001",
+      "title": "IMPLEMENTATION OF SAP HCM PROCESSES AND FORMS FUNCTIONALITY",
+      "status": "complete",
+      "identifiers": [
+        {
+          "id": "00000001",
+          "scheme": "US_OR-PDX-BS-BIDNBR"
+        }
+      ],
+      "procuringEntity": {
+        "id": "US_OR-PDX-BS-ABBR-PSSRP",
+        "name": "CITYWIDE PROJECTS - OMF"
+      },
+      "value": {
+        "amount": 400000.0,
+        "currency": "USD"
+      },
+      "mainProcurementCategory": "services",
+      "awardCriteria": "ratedCriteria",
+      "tenderPeriod": {
+        "startDate": "2015-04-29T00:00:00-07:00",
+        "endDate": "2015-11-06T00:00:00-08:00"
+      },
+      "enquiryPeriod": {
+        "endDate": "2015-11-06T00:00:00-08:00"
+      },
+      "awardPeriod": {
+        "startDate": "2015-11-06T00:00:00-08:00"
+      },
+      "tenderers": [
+        {
+          "id": "US_OR-PDX-BS-VNBR-M0206287",
+          "name": "MOURI Tech LLC"
+        }
+      ]
+    },
+    "awards": [
+      {
+        "id": "30004792",
+        "title": "SAP HCM P&F SVCS",
+        "status": "active",
+        "date": "2015-11-06T00:00:00-08:00",
+        "value": {
+          "amount": 391600.0,
+          "currency": "USD"
+        },
+        "suppliers": [
+          {
+            "id": "US_OR-PDX-BS-VNBR-M0206287",
+            "name": "MOURI Tech LLC"
+          }
+        ],
+        "contractPeriod": {
+          "startDate": "2015-09-23T00:00:00-07:00",
+          "endDate": "2016-12-31T00:00:00-08:00"
+        },
+        "documents": [
+          {
+            "id": "187079",
+            "documentType": "awardNotice",
+            "title": "\"City Ordinance #187079 authorizing the contract\"",
+            "description": "\"To obtain the document please visit https://efiles.portlandoregon.gov/ and search for the Ordinance number \"187079\"",
+            "format": "application/pdf",
+            "language": "en"
+          }
+        ]
+      }
+    ],
+    "contracts": [
+      {
+        "id": "30004792",
+        "awardID": "30004792",
+        "title": "SAP HCM P&F SVCS",
+        "description": "IMPLEMENTATION OF SAP HCM PROCESSES AND FORMS",
+        "status": "terminated",
+        "period": {
+          "startDate": "2015-09-23T00:00:00-07:00",
+          "endDate": "2016-12-31T00:00:00-08:00"
+        },
+        "value": {
+          "amount": 487280.0,
+          "currency": "USD"
+        },
+        "items": [
+          {
+            "id": "22176949-10",
+            "description": "SAP HCM P&F SVCS",
+            "classification": {
+              "id": "92000",
+              "scheme": "NIGP",
+              "description": "DATA PROCESSING, PROGRAMMING, & SOFTWARE SERVICES"
+            },
+            "quantity": 391600.0,
+            "unit": {
+              "id": "M4",
+              "scheme": "UNCEFACT",
+              "name": "monetary value",
+              "value": {
+                "amount": 1.0,
+                "currency": "USD"
+              }
+            }
+          },
+          {
+            "id": "22188989-10",
+            "description": "Invoice # COP-SE_Apr16-1",
+            "classification": {
+              "id": "96200",
+              "scheme": "NIGP",
+              "description": "MISCELLANEOUS SERVICES"
+            },
+            "quantity": 4960.0,
+            "unit": {
+              "id": "M4",
+              "scheme": "UNCEFACT",
+              "name": "monetary value",
+              "value": {
+                "amount": 1.0,
+                "currency": "USD"
+              }
+            }
+          },
+          {
+            "id": "22189084-10",
+            "description": "Invoice # COP - PH3 - Apr16",
+            "classification": {
+              "id": "96200",
+              "scheme": "NIGP",
+              "description": "MISCELLANEOUS SERVICES"
+            },
+            "quantity": 75680.0,
+            "unit": {
+              "id": "M4",
+              "scheme": "UNCEFACT",
+              "name": "monetary value",
+              "value": {
+                "amount": 1.0,
+                "currency": "USD"
+              }
+            }
+          },
+          {
+            "id": "22192213-10",
+            "description": "Consulting Services for SAP HCM Forms",
+            "classification": {
+              "id": "96200",
+              "scheme": "NIGP",
+              "description": "MISCELLANEOUS SERVICES"
+            },
+            "quantity": 2560.0,
+            "unit": {
+              "id": "M4",
+              "scheme": "UNCEFACT",
+              "name": "monetary value",
+              "value": {
+                "amount": 1.0,
+                "currency": "USD"
+              }
+            }
+          },
+          {
+            "id": "22199888-10",
+            "description": "Mouri tech - Consulting Svcs.",
+            "classification": {
+              "id": "96100",
+              "scheme": "NIGP",
+              "description": "MISCELLANEOUS PROFESSIONAL SERVICES"
+            },
+            "quantity": 78320.0,
+            "unit": {
+              "id": "M4",
+              "scheme": "UNCEFACT",
+              "name": "monetary value",
+              "value": {
+                "amount": 1.0,
+                "currency": "USD"
+              }
+            }
+          }
+        ],
+        "milestones": [
+          {
+            "id": "187079-30004792-CA",
+            "title": "Contract Administrator",
+            "type": "approval",
+            "description": "Contract Administrator (the Procurement Services \"Buyer\") approved the contract in SAP. The contract is awating approval from others to execute the contract. The contract is not finalized until the City Auditor approves the contract, indicated by \"AU.\"",
+            "code": "CA",
+            "status": "met"
+          },
+          {
+            "id": "187079-30004792-AU",
+            "title": "City Auditor",
+            "type": "approval",
+            "description": "City Auditor approved the contract in SAP. The contract is finalized, as indicated by \"AU.\"",
+            "code": "AU",
+            "status": "met"
+          }
+        ],
+        "implementation": {
+          "transactions": [
+            {
+              "id": "22176949-10",
+              "date": "2016-12-31T00:00:00-08:00",
+              "value": {
+                "amount": 325760.0,
+                "currency": "USD"
+              },
+              "payer": {
+                "id": "US_OR-PDX-BS-ABBR-PSSRP",
+                "name": "CITYWIDE PROJECTS - OMF"
+              },
+              "payee": {
+                "id": "US_OR-PDX-BS-VNBR-M0206287",
+                "name": "MOURI Tech LLC"
+              },
+              "relatedImplementationMilestone": {
+                "id": "PO-22176949-10",
+                "title": "SAP HCM P&F SVCS"
+              },
+              "purchaseOrderId": "22176949"
+            },
+            {
+              "id": "22188989-10",
+              "date": "2016-06-30T00:00:00-07:00",
+              "value": {
+                "amount": 4960.0,
+                "currency": "USD"
+              },
+              "payer": {
+                "id": "US_OR-PDX-BS-ABBR-PSSRP",
+                "name": "CITYWIDE PROJECTS - OMF"
+              },
+              "payee": {
+                "id": "US_OR-PDX-BS-VNBR-M0206287",
+                "name": "MOURI Tech LLC"
+              },
+              "relatedImplementationMilestone": {
+                "id": "PO-22188989-10",
+                "title": "Invoice # COP-SE_Apr16-1"
+              },
+              "purchaseOrderId": "22188989"
+            },
+            {
+              "id": "22189084-10",
+              "date": "2016-06-30T00:00:00-07:00",
+              "value": {
+                "amount": 75680.0,
+                "currency": "USD"
+              },
+              "payer": {
+                "id": "US_OR-PDX-BS-ABBR-PSSRP",
+                "name": "CITYWIDE PROJECTS - OMF"
+              },
+              "payee": {
+                "id": "US_OR-PDX-BS-VNBR-M0206287",
+                "name": "MOURI Tech LLC"
+              },
+              "relatedImplementationMilestone": {
+                "id": "PO-22189084-10",
+                "title": "Invoice # COP - PH3 - Apr16"
+              },
+              "purchaseOrderId": "22189084"
+            },
+            {
+              "id": "22192213-10",
+              "date": "2017-06-30T00:00:00-07:00",
+              "value": {
+                "amount": 2560.0,
+                "currency": "USD"
+              },
+              "payer": {
+                "id": "US_OR-PDX-BS-ABBR-PSSRP",
+                "name": "CITYWIDE PROJECTS - OMF"
+              },
+              "payee": {
+                "id": "US_OR-PDX-BS-VNBR-M0206287",
+                "name": "MOURI Tech LLC"
+              },
+              "relatedImplementationMilestone": {
+                "id": "PO-22192213-10",
+                "title": "Consulting Services for SAP HCM Forms"
+              },
+              "purchaseOrderId": "22192213"
+            },
+            {
+              "id": "22199888-10",
+              "date": "2017-06-30T00:00:00-07:00",
+              "value": {
+                "amount": 78320.0,
+                "currency": "USD"
+              },
+              "payer": {
+                "id": "US_OR-PDX-BS-ABBR-PSSRP",
+                "name": "CITYWIDE PROJECTS - OMF"
+              },
+              "payee": {
+                "id": "US_OR-PDX-BS-VNBR-M0206287",
+                "name": "MOURI Tech LLC"
+              },
+              "relatedImplementationMilestone": {
+                "id": "PO-22199888-10",
+                "title": "Mouri tech - Consulting Svcs."
+              },
+              "purchaseOrderId": "22199888"
+            }
+          ],
+          "milestones": [
+            {
+              "id": "PO-22176949-10",
+              "title": "SAP HCM P&F SVCS",
+              "type": "payment",
+              "dueDate": "2016-12-31T00:00:00-08:00",
+              "status": "partiallyMet",
+              "purchaseOrderId": "22176949"
+            },
+            {
+              "id": "PO-22188989-10",
+              "title": "Invoice # COP-SE_Apr16-1",
+              "type": "payment",
+              "dueDate": "2016-06-30T00:00:00-07:00",
+              "status": "met",
+              "purchaseOrderId": "22188989"
+            },
+            {
+              "id": "PO-22189084-10",
+              "title": "Invoice # COP - PH3 - Apr16",
+              "type": "payment",
+              "dueDate": "2016-06-30T00:00:00-07:00",
+              "status": "met",
+              "purchaseOrderId": "22189084"
+            },
+            {
+              "id": "PO-22192213-10",
+              "title": "Consulting Services for SAP HCM Forms",
+              "type": "payment",
+              "dueDate": "2017-06-30T00:00:00-07:00",
+              "status": "met",
+              "purchaseOrderId": "22192213"
+            },
+            {
+              "id": "PO-22199888-10",
+              "title": "Mouri tech - Consulting Svcs.",
+              "type": "payment",
+              "dueDate": "2017-06-30T00:00:00-07:00",
+              "status": "met",
+              "purchaseOrderId": "22199888"
+            }
+          ],
+          "purchaseOrders": [
+            {
+              "id": "22176949",
+              "title": "SAP HCM P&F SVCS",
+              "executionPeriod": {
+                "startDate": "2015-10-19T00:00:00-07:00",
+                "endDate": "2016-12-31T00:00:00-08:00"
+              }
+            },
+            {
+              "id": "22188989",
+              "title": "Invoice # COP-SE_Apr16-1",
+              "executionPeriod": {
+                "startDate": "2016-05-10T00:00:00-07:00",
+                "endDate": "2016-06-30T00:00:00-07:00"
+              }
+            },
+            {
+              "id": "22189084",
+              "title": "Invoice # COP - PH3 - Apr16",
+              "executionPeriod": {
+                "startDate": "2016-05-11T00:00:00-07:00",
+                "endDate": "2016-06-30T00:00:00-07:00"
+              }
+            },
+            {
+              "id": "22192213",
+              "title": "Consulting Services for SAP HCM Forms",
+              "executionPeriod": {
+                "startDate": "2016-06-13T00:00:00-07:00",
+                "endDate": "2017-06-30T00:00:00-07:00"
+              }
+            },
+            {
+              "id": "22199888",
+              "title": "Mouri tech - Consulting Svcs.",
+              "executionPeriod": {
+                "startDate": "2016-10-10T00:00:00-07:00",
+                "endDate": "2017-06-30T00:00:00-07:00"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "initiationType": "tender"
+  }
+}
