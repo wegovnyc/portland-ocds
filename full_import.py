@@ -195,6 +195,7 @@ def map_contract(contract, award_id, tender_title=None):
         "items": map_items(contract.get('items'), default_desc=title),
         "items": map_items(contract.get('items'), default_desc=title),
         "milestones": map_milestones(contract.get('milestones', [])),
+        "period": map_period(contract.get('period')),
         "implementation": map_implementation(contract.get('implementation')),
         "agreedMetrics": map_metrics(contract.get('agreedMetrics'))
     }
@@ -216,7 +217,9 @@ def map_tender(release):
     data = {
         "title": t.get('title', "Imported Tender"),
         "title_en": t.get('title'), 
-        "description": t.get('description'),
+        "title": t.get('title', "Imported Tender"),
+        "title_en": t.get('title'), 
+        "description": f"Publisher: {release.get('publisher', {}).get('name', 'Unknown')}\nVersion: {release.get('version', '1.0')}\n\n{t.get('description', '')}",
         "procurementMethodType": "belowThreshold", # Force type
         "tenderID": release.get('ocid'),
         "mode": "test",
@@ -342,10 +345,11 @@ def map_organization(org):
             "locality": org.get('address', {}).get('locality', "New York"),
             "streetAddress": org.get('address', {}).get('streetAddress', "-")
         },
-         "contactPoint": {
+        "contactPoint": {
             "name": org.get('contactPoint', {}).get('name', "Contact"),
             "telephone": org.get('contactPoint', {}).get('telephone', "-") 
-        }
+        },
+        "additionalIdentifiers": org.get('additionalIdentifiers', [])
     }
 
 def map_bid(supplier, value):
@@ -365,7 +369,8 @@ def map_award(award, bid_id):
         "date": now.isoformat(),
         "value": map_value(award.get('value')),
         "suppliers": [map_organization(s) for s in award.get('suppliers', [])],
-        "bid_id": bid_id
+        "bid_id": bid_id,
+        "documents": map_documents(award.get('documents', []))
     }
 
 def map_milestones(milestones):
@@ -448,7 +453,29 @@ def map_organization_ref(ref):
             "legalName": ref.get('name', 'Unknown')
         },
         "address": {"countryName": "United States", "region": "NY", "locality": "New York", "streetAddress": "-"},
+        "address": {"countryName": "United States", "region": "NY", "locality": "New York", "streetAddress": "-"},
         "contactPoint": {"name": "Contact", "telephone": "-"}
+    }
+
+def map_documents(docs):
+    if not docs: return []
+    res = []
+    for d in docs:
+        res.append({
+            "title": d.get('title', 'Document'),
+            "documentType": d.get('documentType', 'notice'),
+            "format": d.get('format', 'text/plain'),
+            "url": d.get('url', '#'),
+            "datePublished": d.get('datePublished', datetime.now().isoformat()),
+            "description": d.get('description')
+        })
+    return res
+
+def map_period(period):
+    if not period: return None
+    return {
+        "startDate": period.get('startDate'),
+        "endDate": period.get('endDate')
     }
 
 if __name__ == "__main__":

@@ -17,7 +17,9 @@ const TenderDetail: React.FC<TenderDetailProps> = ({ id, onClose }) => {
 
     if (!id) return null;
 
-    const tender = data?.data;
+    const rawData = data?.data;
+    // Flatten OCDS structure: data.tender properties (title, etc) should be accessible at top level for this UI
+    const tender = rawData ? { ...rawData, ...(rawData.tender || {}) } : null;
 
     return (
         <>
@@ -117,6 +119,14 @@ const TenderDetail: React.FC<TenderDetailProps> = ({ id, onClose }) => {
                                     <a href={`mailto:${tender.procuringEntity?.contactPoint?.email}`} style={{ color: 'var(--primary-color)' }}>{tender.procuringEntity?.contactPoint?.email}</a>
                                     <div>{tender.procuringEntity?.contactPoint?.telephone}</div>
                                 </div>
+                                {tender.procuringEntity?.additionalIdentifiers && tender.procuringEntity.additionalIdentifiers.length > 0 && (
+                                    <div style={{ gridColumn: 'span 2', marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                        <span className="label">Additional IDs: </span>
+                                        {tender.procuringEntity.additionalIdentifiers.map((id: any, i: number) => (
+                                            <span key={i} style={{ marginRight: '0.5rem' }}>{id.scheme}-{id.id} ({id.legalName})</span>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -396,7 +406,14 @@ const AwardCard = ({ award }: { award: any }) => {
         }>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                 <span className={`status-badge ${award.status === 'active' ? 'status-active' : ''}`}>{award.status}</span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{new Date(award.date).toLocaleDateString()}</span>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'right' }}>
+                    <div>{new Date(award.date).toLocaleDateString()}</div>
+                    {award.contractPeriod && (
+                        <div style={{ fontSize: '0.7rem' }}>
+                            {new Date(award.contractPeriod.startDate).toLocaleDateString()} - {new Date(award.contractPeriod.endDate).toLocaleDateString()}
+                        </div>
+                    )}
+                </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ fontWeight: 'bold' }}>
@@ -417,6 +434,11 @@ const ContractCard = ({ contract }: { contract: any }) => {
                 <div>
                     <span className="label">Date Signed</span>
                     <div>{contract.dateSigned ? new Date(contract.dateSigned).toLocaleDateString() : 'N/A'}</div>
+                    {contract.period && (
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                            {new Date(contract.period.startDate).toLocaleDateString()} - {new Date(contract.period.endDate).toLocaleDateString()}
+                        </div>
+                    )}
                 </div>
                 <div>
                     <span className="label">Award ID</span>

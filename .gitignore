@@ -24,3 +24,6 @@ dist/
 
 # OCDS Data
 OCDS 2025.10.06/
+
+backend/venv/
+deployment.tar.gz

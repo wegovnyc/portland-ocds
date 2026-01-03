@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Legacy services (kept for reference/migration, can be stopped later)
+  couchdb:
+    image: couchdb:2.3
+    restart: always
+    ports:
+      - "5984:5984"
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=admin
+    volumes:
+      - couchdb_data:/opt/couchdb/data
+
+  web:
+    build:
+      context: ./tender-viewer
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./tender-viewer:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000 # Pointing to new FastAPI backend
+
+  # Modern Stack Services
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=tenders_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./OCDS 2025.10.06:/data
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/tenders_db
+    depends_on:
+      - db
+
+volumes:
+  couchdb_data:
+  postgres_data:
