@@ -16,6 +16,7 @@ const ContractList: React.FC = () => {
     const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'dateSigned', direction: 'desc' });
     const navigate = useNavigate();
     const location = useLocation();
+    const params = useParams<{ id: string }>();
 
 
     const query = new URLSearchParams({
@@ -164,8 +165,9 @@ const ContractList: React.FC = () => {
             )}
 
             {/* Modal Detail View */}
+            {/* Modal Detail View */}
             <ContractDetail
-                id={useParams<{ id: string }>().id || null}
+                id={params.id || null}
                 onClose={() => navigate('/contracts' + location.search)}
             />
         </div>

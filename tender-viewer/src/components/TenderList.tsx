@@ -137,6 +137,7 @@ const TenderList: React.FC = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const params = useParams<{ id: string }>();
 
     const renderCard = (item: any) => {
         const tender = item.tender || {};
@@ -414,7 +415,7 @@ const TenderList: React.FC = () => {
 
             {/* Modal Detail View */}
             <TenderDetail
-                id={useParams<{ id: string }>().id || null}
+                id={params.id || null}
                 onClose={() => navigate('/tenders' + location.search)}
             />
         </>
