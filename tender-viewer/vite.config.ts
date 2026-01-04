@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     host: true,
     port: 3000,
+    allowedHosts: ['portland-ocds.wegov.nyc'],
     proxy: {
       '/api/2.4': {
         target: 'http://api:8000',
