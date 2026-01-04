@@ -36,6 +36,10 @@ const TenderList: React.FC = () => {
     const [hasDate, setHasDate] = useState<string>('yes');
     const [page, setPage] = useState(1);
 
+    const navigate = useNavigate();
+    const location = useLocation();
+    const params = useParams<{ id: string }>();
+
 
     // Construct Query URL
     // Endpoint: /api/2.4/tenders (proxied to FastAPI /tenders)
@@ -134,10 +138,6 @@ const TenderList: React.FC = () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
-
-    const navigate = useNavigate();
-    const location = useLocation();
-    const params = useParams<{ id: string }>();
 
     const renderCard = (item: any) => {
         const tender = item.tender || {};
