@@ -46,6 +46,8 @@ def get_tenders(
     search: str = None,
     status: str = None,
     min_value: float = None,
+    active_at: str = None,
+    has_date: str = None,
     sort_by: str = "dateModified",
     descending: bool = True,
     db: Session = Depends(get_db)
@@ -69,6 +71,17 @@ def get_tenders(
     if min_value is not None:
         query = query.filter(text("(data->'tender'->'value'->>'amount')::numeric > :min_val")).params(min_val=min_value)
 
+    # Active At Filter
+    if active_at:
+        query = query.filter(text("(data->'tender'->'tenderPeriod'->>'startDate')::timestamp <= :active_at::timestamp AND (data->'tender'->'tenderPeriod'->>'endDate')::timestamp >= :active_at::timestamp")).params(active_at=active_at)
+
+    # Has Date Filter (Tender Date Present)
+    if has_date:
+        if has_date == "yes":
+            query = query.filter(text("data->'tender'->'tenderPeriod'->>'startDate' IS NOT NULL"))
+        elif has_date == "no":
+             query = query.filter(text("data->'tender'->'tenderPeriod'->>'startDate' IS NULL"))
+
     # Sorting
     if sort_by == "value":
         sort_field = "(data->'tender'->'value'->>'amount')::numeric"
@@ -81,6 +94,17 @@ def get_tenders(
         sort_field = "data->'tender'->'tenderPeriod'->>'startDate'"
     elif sort_by == "endDate":
         sort_field = "data->'tender'->'tenderPeriod'->>'endDate'"
+    elif sort_by == "complexity":
+        # Sort by sum of details (Awards + Contracts + Documents + Items + Milestones + Bids)
+        # Using jsonb_array_length with COALESCE to handle nulls (defaults to empty array '[]')
+        sort_field = """(
+            jsonb_array_length(COALESCE(data->'tender'->'awards', '[]'::jsonb)) +
+            jsonb_array_length(COALESCE(data->'contracts', '[]'::jsonb)) +
+            jsonb_array_length(COALESCE(data->'tender'->'documents', '[]'::jsonb)) +
+            jsonb_array_length(COALESCE(data->'tender'->'items', '[]'::jsonb)) +
+            jsonb_array_length(COALESCE(data->'tender'->'milestones', '[]'::jsonb)) +
+            jsonb_array_length(COALESCE(data->'bids', '[]'::jsonb))
+        )"""
     else:
         sort_field = "data->>'date'"
 
@@ -131,6 +155,102 @@ def get_tender_by_id(tender_id: str, db: Session = Depends(get_db)):
         return {"data": None, "error": "Not Found"}
 
     return {"data": tender.data}
+
+@app.get("/contracts")
+def get_contracts(
+    limit: int = 50,
+    offset: int = 0,
+    sort_by: str = "dateSigned",
+    descending: bool = True,
+    db: Session = Depends(get_db)
+):
+    # Flatten contracts from all tenders
+    # We select the contract object and the parent tenderID for context
+    
+    # Base selection
+    base_query = """
+        SELECT 
+            c.value as contract,
+            t.data->>'id' as ocds_id,
+            t.data->'tender'->>'title' as tender_title
+        FROM 
+            tenders t,
+            jsonb_array_elements(COALESCE(t.data->'contracts', '[]'::jsonb)) c
+    """
+
+    # Sorting
+    if sort_by == "value":
+        sort_field = "(c.value->'value'->>'amount')::numeric"
+    elif sort_by == "dateSigned":
+        sort_field = "(c.value->>'dateSigned')::timestamp"
+    else:
+        sort_field = "(c.value->>'dateSigned')::timestamp"
+    
+    direction = "DESC" if descending else "ASC"
+    
+    order_clause = f"ORDER BY {sort_field} {direction} NULLS LAST"
+    
+    # Pagination
+    limit_clause = f"LIMIT {limit} OFFSET {offset}"
+    
+    # Final Query
+    sql = f"{base_query} {order_clause} {limit_clause}"
+    
+    result = db.execute(text(sql)).fetchall()
+    
+    # Count Query (Expensive query, maybe estimate or cache later? For now direct count)
+    count_sql = "SELECT count(*) FROM tenders t, jsonb_array_elements(COALESCE(t.data->'contracts', '[]'::jsonb)) c"
+    total = db.execute(text(count_sql)).scalar()
+
+    contracts = []
+    for row in result:
+        # row keys: contract, ocds_id, tender_title
+        # We wrap it to provide context
+        contract = row[0]
+        # Inject context into contract object for frontend convenience (or keep separate)
+        # Let's keep the contract object pure OCDS but maybe add a helper field if needed.
+        # Ideally frontend receives a wrapper.
+        contracts.append({
+            "contract": contract,
+            "tender_id": row[1],
+            "tender_title": row[2]
+        })
+
+    return {
+        "data": contracts,
+        "meta": {
+            "total": total,
+            "limit": limit,
+            "offset": offset
+        }
+    }
+
+@app.get("/contracts/{contract_id}")
+def get_contract(contract_id: str, db: Session = Depends(get_db)):
+    sql = """
+        SELECT 
+            c.value as contract,
+            t.data->>'id' as ocds_id,
+            t.data->'tender'->>'title' as tender_title
+        FROM 
+            tenders t,
+            jsonb_array_elements(COALESCE(t.data->'contracts', '[]'::jsonb)) c
+        WHERE
+            c.value->>'id' = :contract_id
+        LIMIT 1
+    """
+    
+    result = db.execute(text(sql), {"contract_id": contract_id}).fetchone()
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Contract not found")
+        
+    contract = result[0]
+    return {
+        "contract": contract,
+        "tender_id": result[1],
+        "tender_title": result[2]
+    }
 
 @app.get("/health")
 def health():

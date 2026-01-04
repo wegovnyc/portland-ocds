@@ -30,26 +30,40 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   }
 }
 
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import ContractList from './components/ContractList';
+import TenderPage from './components/TenderPage';
+import ContractPage from './components/ContractPage';
+
 function App() {
   return (
-    <ErrorBoundary>
-      <div>
-        <header className="header">
-          <div>
-            <h1>Contract Explorer for the City of Portland, Oregon</h1>
-            <p style={{ color: 'var(--text-secondary)' }}>An experimental website using Portland, Oregon's Open Contracting Data Standard (OCDS) compliant contracting dataset, openprocurement.api and this vibe coded front-end application.</p>
-          </div>
-          <div>
-            {/* User profile or settings could go here */}
-            <div style={{ width: '40px', height: '40px', background: '#333', borderRadius: '50%' }}></div>
-          </div>
-        </header>
+    <Router>
+      <ErrorBoundary>
+        <div>
+          <header className="header">
+            <div>
+              <h1>Contract Explorer for the City of Portland, Oregon</h1>
+              <p style={{ color: 'var(--text-secondary)' }}>An experimental website using Portland, Oregon's Open Contracting Data Standard (OCDS) compliant contracting dataset, openprocurement.api and this vibe coded front-end application.</p>
+            </div>
+            <div>
+              <div style={{ width: '40px', height: '40px', background: '#333', borderRadius: '50%' }}></div>
+            </div>
+          </header>
 
-        <main>
-          <TenderList />
-        </main>
-      </div >
-    </ErrorBoundary >
+          <main>
+            {/* <Navbar /> */}
+            <Routes>
+              <Route path="/" element={<TenderList />} />
+              <Route path="/tenders" element={<TenderList />} />
+              <Route path="/tenders/:id" element={<TenderList />} />
+              {/* <Route path="/contracts" element={<ContractList />} />
+              <Route path="/contracts/:id" element={<ContractList />} /> */}
+            </Routes>
+          </main>
+        </div >
+      </ErrorBoundary >
+    </Router>
   )
 }
 
