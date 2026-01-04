@@ -165,7 +165,6 @@ const ContractList: React.FC = () => {
             )}
 
             {/* Modal Detail View */}
-            {/* Modal Detail View */}
             <ContractDetail
                 id={params.id || null}
                 onClose={() => navigate('/contracts' + location.search)}
