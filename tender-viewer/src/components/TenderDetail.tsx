@@ -1,7 +1,7 @@
 import React from 'react';
 import useSWR from 'swr';
 import '../App.css';
-import { formatTitle, formatAmount } from '../utils';
+import { formatTitle, formatAmount, formatStatus } from '../utils';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -217,6 +217,9 @@ const TenderDetail: React.FC<TenderDetailProps> = ({ id, onClose }) => {
                                 {tender.contracts.map((contract: any) => (
                                     <ContractCard key={contract.id} contract={contract} />
                                 ))}
+                                <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic', padding: '0.5rem', borderLeft: '2px solid var(--text-secondary)' }}>
+                                    NOTE: Original data used status "Terminated" to denote all contracts that are no longer active. We've changed "Terminated" to "Closed" to make the system more legible.
+                                </div>
                             </>
                         )}
 
@@ -535,7 +538,7 @@ const ContractCard = ({ contract }: { contract: any }) => {
             </div>
         }>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <span className={`status-badge ${contract.status === 'active' ? 'status-active' : 'status-complete'}`}>{contract.status}</span>
+                <span className={`status-badge ${contract.status === 'active' ? 'status-active' : 'status-complete'}`}>{formatStatus(contract.status)}</span>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{new Date(contract.date).toLocaleDateString()}</span>
             </div>
             <div style={{ fontWeight: 'bold' }}>

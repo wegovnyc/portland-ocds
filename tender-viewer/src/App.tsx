@@ -33,8 +33,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import ContractList from './components/ContractList';
-import TenderPage from './components/TenderPage';
-import ContractPage from './components/ContractPage';
+
 
 function App() {
   return (

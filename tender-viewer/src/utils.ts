@@ -12,3 +12,9 @@ export const formatAmount = (value: { amount: number, currency: string } | undef
     // Format as $xx,xxx
     return `$${value.amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 };
+
+export const formatStatus = (status: string | undefined) => {
+    if (!status) return 'Unknown';
+    if (status.toLowerCase() === 'terminated') return 'Closed';
+    return status.charAt(0).toUpperCase() + status.slice(1);
+};
