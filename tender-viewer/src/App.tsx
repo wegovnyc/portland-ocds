@@ -43,7 +43,7 @@ function App() {
           <header className="header">
             <div>
               <h1>Contract Explorer for the City of Portland, Oregon</h1>
-              <p style={{ color: 'var(--text-secondary)' }}>An experimental website using Portland, Oregon's Open Contracting Data Standard (OCDS) compliant contracting dataset, openprocurement.api and this vibe coded front-end application.</p>
+              <p style={{ color: 'var(--text-secondary)' }}>This website is built using the City of Portland Open Contracting Data Standard (OCDS) <a href="https://www.portland.gov/business-opportunities/ocds" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>dataset</a>, an <a href="https://api-docs.openprocurement.org/en/latest/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>openprocurement.api</a> backend and a custom gen-AI-built front end. It was created by <a href="https://wegov.nyc" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>WeGov.NYC</a> to demonstrate what an OCDS dataset interface.</p>
             </div>
             <div>
               <div style={{ width: '40px', height: '40px', background: '#333', borderRadius: '50%' }}></div>

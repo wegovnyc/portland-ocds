@@ -101,7 +101,8 @@ const TenderList: React.FC = () => {
     const { data: detailedData } = useSWR(`/api/2.4/tenders?${detailedQuery.toString()}`, fetcher);
     const detailedTenders = detailedData?.data || [];
 
-
+    // Fetch Summary Stats
+    const { data: statsData } = useSWR('/api/2.4/tenders/stats', fetcher);
 
     const handleSort = (key: string) => {
         let direction: 'asc' | 'desc' = 'asc';
@@ -206,6 +207,97 @@ const TenderList: React.FC = () => {
 
     return (
         <>
+            {/* Dataset Summary Stats */}
+            {statsData && (
+                <div style={{
+                    marginBottom: '2rem',
+                    padding: '1.5rem',
+                    background: 'linear-gradient(135deg, rgba(187, 134, 252, 0.1), rgba(3, 218, 198, 0.1))',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                    <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--accent)' }}>
+                        Dataset Overview
+                    </h2>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem' }}>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--accent)' }}>
+                                {statsData.tenders?.toLocaleString() || 0}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Tenders</div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--secondary-color)' }}>
+                                {statsData.contracts?.toLocaleString() || 0}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Contracts</div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#fff' }}>
+                                {statsData.items?.toLocaleString() || 0}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Items</div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#fff' }}>
+                                {statsData.milestones?.toLocaleString() || 0}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Milestones</div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#fff' }}>
+                                {statsData.transactions?.toLocaleString() || 0}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Transactions</div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#fff' }}>
+                                {statsData.purchaseOrders?.toLocaleString() || 0}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Purchase Orders</div>
+                        </div>
+                    </div>
+                    <div style={{
+                        marginTop: '1rem',
+                        paddingTop: '1rem',
+                        borderTop: '1px solid rgba(255,255,255,0.1)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '1rem'
+                    }}>
+                        <div>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Total Award Value: </span>
+                            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--secondary-color)' }}>
+                                ${(statsData.totalAwardValue || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            </span>
+                        </div>
+                        <div style={{ fontSize: '0.8rem', textAlign: 'right' }}>
+                            {statsData.minDate && statsData.maxDate && (
+                                <div style={{ color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+                                    <span>Dataset Period: </span>
+                                    <span style={{ color: '#fff' }}>
+                                        {new Date(statsData.minDate).toLocaleDateString()} — {new Date(statsData.maxDate).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            )}
+                            <div>
+                                <span style={{ color: 'var(--text-secondary)' }}>Data Source: </span>
+                                <a
+                                    href="https://www.portland.gov/business-opportunities/ocds"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ color: 'var(--accent)', textDecoration: 'none' }}
+                                >
+                                    City of Portland, Oregon
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Recent Tenders Section */}
             <div style={{ marginBottom: '3rem' }}>
                 <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', borderLeft: '4px solid var(--accent)', paddingLeft: '1rem' }}>

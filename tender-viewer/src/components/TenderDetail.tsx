@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import useSWR from 'swr';
 import '../App.css';
 import { formatTitle, formatAmount, formatStatus } from '../utils';
@@ -12,14 +13,40 @@ interface TenderDetailProps {
 
 const TenderDetail: React.FC<TenderDetailProps> = ({ id, onClose }) => {
     const { data, error, isLoading } = useSWR(id ? `/api/2.4/tenders/${id}` : null, fetcher);
-
-    const isOpen = !!id;
-
-    if (!id) return null;
+    const location = useLocation();
+    const [expandedContractId, setExpandedContractId] = useState<string | null>(null);
+    const [expandedAwardId, setExpandedAwardId] = useState<string | null>(null);
 
     const rawData = data?.data;
     // Flatten OCDS structure: data.tender properties (title, etc) should be accessible at top level for this UI
     const tender = rawData ? { ...rawData, ...(rawData.tender || {}) } : null;
+
+    // Check URL hash for contract permalink
+    useEffect(() => {
+        const hash = location.hash;
+        if (hash && hash.startsWith('#contract-') && tender) {
+            const contractId = hash.replace('#contract-', '');
+            setExpandedContractId(contractId);
+
+            // Find which award contains this contract
+            const contract = (tender.contracts || []).find((c: any) => c.id === contractId);
+            if (contract?.awardID) {
+                setExpandedAwardId(contract.awardID);
+            }
+
+            // Scroll to contract after a short delay to allow expansion
+            setTimeout(() => {
+                const element = document.getElementById(`contract-${contractId}`);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 300);
+        }
+    }, [location.hash, tender]);
+
+    const isOpen = !!id;
+
+    if (!id) return null;
 
     return (
         <>
@@ -205,21 +232,22 @@ const TenderDetail: React.FC<TenderDetailProps> = ({ id, onClose }) => {
                         {tender.awards && tender.awards.length > 0 && (
                             <>
                                 <h3 style={{ marginTop: '2rem' }}>Awards ({tender.awards.length})</h3>
-                                {tender.awards.map((award: any) => (
-                                    <AwardCard key={award.id} award={award} />
-                                ))}
-                            </>
-                        )}
-
-                        {tender.contracts && tender.contracts.length > 0 && (
-                            <>
-                                <h3 style={{ marginTop: '2rem' }}>Contracts ({tender.contracts.length})</h3>
-                                {tender.contracts.map((contract: any) => (
-                                    <ContractCard key={contract.id} contract={contract} />
-                                ))}
-                                <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic', padding: '0.5rem', borderLeft: '2px solid var(--text-secondary)' }}>
-                                    NOTE: Original data used status "Terminated" to denote all contracts that are no longer active. We've changed "Terminated" to "Closed" to make the system more legible.
-                                </div>
+                                {tender.awards.map((award: any, index: number) => {
+                                    const linkedContracts = (tender.contracts || []).filter(
+                                        (c: any) => c.awardID === award.id
+                                    );
+                                    return (
+                                        <AwardCard
+                                            key={award.id}
+                                            award={award}
+                                            contracts={linkedContracts}
+                                            showContractNote={index === 0 && linkedContracts.length > 0}
+                                            tenderId={id || undefined}
+                                            expandedContractId={expandedContractId}
+                                            isExpanded={expandedAwardId === award.id}
+                                        />
+                                    );
+                                })}
                             </>
                         )}
 
@@ -276,8 +304,13 @@ const TenderDetail: React.FC<TenderDetailProps> = ({ id, onClose }) => {
     );
 };
 
-const Card = ({ children, expandedContent }: { children: React.ReactNode, expandedContent?: React.ReactNode }) => {
-    const [expanded, setExpanded] = React.useState(false);
+const Card = ({ children, expandedContent, defaultExpanded = false }: { children: React.ReactNode, expandedContent?: React.ReactNode, defaultExpanded?: boolean }) => {
+    const [expanded, setExpanded] = React.useState(defaultExpanded);
+
+    // Sync with external defaultExpanded prop
+    React.useEffect(() => {
+        if (defaultExpanded) setExpanded(true);
+    }, [defaultExpanded]);
     return (
         <div
             className="card"
@@ -288,7 +321,10 @@ const Card = ({ children, expandedContent }: { children: React.ReactNode, expand
                 borderColor: expanded ? 'rgba(187, 134, 252, 0.5)' : 'rgba(255, 255, 255, 0.05)',
                 background: expanded ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)'
             }}
-            onClick={() => setExpanded(!expanded)}
+            onClick={(e) => {
+                e.stopPropagation();
+                setExpanded(!expanded);
+            }}
         >
             <div style={{ width: '100%' }}>
                 {children}
@@ -301,6 +337,39 @@ const Card = ({ children, expandedContent }: { children: React.ReactNode, expand
             {expandedContent && (
                 <div style={{ textAlign: 'center', marginTop: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
                     {expanded ? 'Show Less' : 'Show Details'}
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Collapsible section for sub-items within cards
+const CollapsibleSection = ({ title, count, children }: { title: string, count: number, children: React.ReactNode }) => {
+    const [expanded, setExpanded] = React.useState(false);
+    if (count === 0) return null;
+    return (
+        <div style={{ marginTop: '1rem' }}>
+            <div
+                onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    padding: '0.5rem',
+                    background: 'rgba(255,255,255,0.03)',
+                    borderRadius: '4px',
+                    marginBottom: expanded ? '0.5rem' : 0
+                }}
+            >
+                <span className="label" style={{ margin: 0 }}>{title} ({count})</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    {expanded ? '▲ Collapse' : '▼ Expand'}
+                </span>
+            </div>
+            {expanded && (
+                <div style={{ display: 'grid', gap: '0.5rem' }}>
+                    {children}
                 </div>
             )}
         </div>
@@ -387,7 +456,7 @@ const BidCard = ({ bid }: { bid: any }) => {
     );
 };
 
-const AwardCard = ({ award }: { award: any }) => {
+const AwardCard = ({ award, contracts = [], showContractNote = false, tenderId, expandedContractId, isExpanded = false }: { award: any, contracts?: any[], showContractNote?: boolean, tenderId?: string, expandedContractId?: string | null, isExpanded?: boolean }) => {
     const org = award.suppliers?.[0];
     return (
         <Card expandedContent={
@@ -405,8 +474,26 @@ const AwardCard = ({ award }: { award: any }) => {
                     <span className="label">Period</span>
                     <div>{new Date(award.date).toLocaleDateString()}</div>
                 </div>
+                {contracts.length > 0 && (
+                    <div style={{ gridColumn: 'span 2', marginTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}>
+                        <span className="label" style={{ marginBottom: '0.5rem', display: 'block' }}>Contracts ({contracts.length})</span>
+                        {contracts.map((contract: any) => (
+                            <ContractCard
+                                key={contract.id}
+                                contract={contract}
+                                tenderId={tenderId}
+                                isExpanded={expandedContractId === contract.id}
+                            />
+                        ))}
+                        {showContractNote && (
+                            <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic', padding: '0.5rem', borderLeft: '2px solid var(--text-secondary)' }}>
+                                NOTE: Original data used status "Terminated" to denote all contracts that are no longer active. We've changed "Terminated" to "Closed" to make the system more legible.
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
-        }>
+        } defaultExpanded={isExpanded}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                 <span className={`status-badge ${award.status === 'active' ? 'status-active' : ''}`}>{award.status}</span>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'right' }}>
@@ -426,125 +513,164 @@ const AwardCard = ({ award }: { award: any }) => {
                     {formatAmount(award.value)}
                 </div>
             </div>
+            {contracts.length > 0 && (
+                <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    {contracts.length} contract{contracts.length > 1 ? 's' : ''} linked
+                </div>
+            )}
         </Card>
     );
 };
 
-const ContractCard = ({ contract }: { contract: any }) => {
+const ContractCard = ({ contract, tenderId, isExpanded = false, onShare }: { contract: any, tenderId?: string, isExpanded?: boolean, onShare?: (contractId: string) => void }) => {
+    const [expanded, setExpanded] = React.useState(isExpanded);
+
+    // Sync with external isExpanded prop (for permalink)
+    React.useEffect(() => {
+        if (isExpanded) setExpanded(true);
+    }, [isExpanded]);
+
+    const handleShare = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (tenderId) {
+            const url = `${window.location.origin}/tenders/${tenderId}#contract-${contract.id}`;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Permalink copied to clipboard!');
+            });
+        }
+    };
+
     return (
-        <Card expandedContent={
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div>
-                    <span className="label">Date Signed</span>
-                    <div>{contract.dateSigned ? new Date(contract.dateSigned).toLocaleDateString() : 'N/A'}</div>
-                    {contract.period && (
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
-                            {new Date(contract.period.startDate).toLocaleDateString()} - {new Date(contract.period.endDate).toLocaleDateString()}
-                        </div>
-                    )}
-                </div>
-                <div>
-                    <span className="label">Award ID</span>
-                    <div style={{ fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>{contract.awardID}</div>
-                </div>
-                <div>
-                    <span className="label">Value</span>
-                    <div className="amount">
-                        {formatAmount(contract.value)}
-                    </div>
-                </div>
-                {contract.items && contract.items.length > 0 && (
-                    <div style={{ gridColumn: 'span 2' }}>
-                        <span className="label">Items</span>
-                        {contract.items.map((item: any, i: number) => (
-                            <div key={i} style={{ fontSize: '0.9rem', marginTop: '0.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
-                                <div>{item.description}</div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                    Qty: {item.quantity} • {item.unit.name} • {item.classification.description}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-                {contract.milestones && contract.milestones.length > 0 && (
-                    <div style={{ gridColumn: 'span 2', marginTop: '1rem' }}>
-                        <span className="label">Milestones</span>
-                        <div style={{ display: 'grid', gap: '0.5rem', marginTop: '0.5rem' }}>
-                            {contract.milestones.map((m: any, i: number) => (
-                                <div key={i} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', borderLeft: `3px solid ${m.status === 'met' ? 'var(--secondary-color)' : 'var(--text-secondary)'}` }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                                        <span style={{ fontWeight: '500' }}>{m.title}</span>
-                                        <span className="status-badge" style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}>{m.status}</span>
-                                    </div>
-                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>{m.description}</div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        Type: {m.type} {m.code ? `(${m.code})` : ''}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-                {contract.implementation && (
-                    <div style={{ gridColumn: 'span 2', marginTop: '1rem' }}>
-                        {contract.implementation.transactions && contract.implementation.transactions.length > 0 && (
-                            <>
-                                <span className="label">Transactions</span>
-                                <div style={{ display: 'grid', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                    {contract.implementation.transactions.map((t: any, i: number) => (
-                                        <div key={i} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <div>
-                                                <div style={{ fontSize: '0.9rem' }}>{new Date(t.date).toLocaleDateString()}</div>
-                                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                                    {t.payer?.name} → {t.payee?.name}
-                                                </div>
-                                            </div>
-                                            <div className="amount">{formatAmount(t.value)}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </>
-                        )}
-                        {contract.implementation.purchaseOrders && contract.implementation.purchaseOrders.length > 0 && (
-                            <div style={{ marginTop: '1rem' }}>
-                                <span className="label">Purchase Orders</span>
-                                <div style={{ display: 'grid', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                    {contract.implementation.purchaseOrders.map((po: any, i: number) => (
-                                        <div key={i} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
-                                            <div style={{ fontSize: '0.9rem', fontWeight: '500' }}>{po.title}</div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                                {po.executionPeriod?.startDate ? new Date(po.executionPeriod.startDate).toLocaleDateString() : ''} - {po.executionPeriod?.endDate ? new Date(po.executionPeriod.endDate).toLocaleDateString() : ''}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-                {contract.agreedMetrics && contract.agreedMetrics.length > 0 && (
-                    <div style={{ gridColumn: 'span 2', marginTop: '1rem' }}>
-                        <span className="label">Agreed Metrics</span>
-                        <div style={{ display: 'grid', gap: '0.5rem', marginTop: '0.5rem' }}>
-                            {contract.agreedMetrics.map((m: any, i: number) => (
-                                <div key={i} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
-                                    <div style={{ fontWeight: '500' }}>{m.title}</div>
-                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{m.description}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
-        }>
+        <div
+            className="card"
+            id={`contract-${contract.id}`}
+            style={{
+                marginTop: '1rem',
+                padding: '1rem',
+                cursor: 'pointer',
+                borderColor: expanded ? 'rgba(187, 134, 252, 0.5)' : 'rgba(255, 255, 255, 0.05)',
+                background: expanded ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)'
+            }}
+            onClick={(e) => {
+                e.stopPropagation();
+                setExpanded(!expanded);
+            }}
+        >
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                 <span className={`status-badge ${contract.status === 'active' ? 'status-active' : 'status-complete'}`}>{formatStatus(contract.status)}</span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{new Date(contract.date).toLocaleDateString()}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    {tenderId && (
+                        <button
+                            onClick={handleShare}
+                            title="Copy permalink"
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontSize: '1rem',
+                                padding: '0.2rem',
+                                color: 'var(--text-secondary)'
+                            }}
+                        >
+                            🔗
+                        </button>
+                    )}
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{contract.date ? new Date(contract.date).toLocaleDateString() : ''}</span>
+                </div>
             </div>
             <div style={{ fontWeight: 'bold' }}>
                 {contract.contractID}
             </div>
-        </Card>
+            {expanded && (
+                <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div>
+                            <span className="label">Date Signed</span>
+                            <div>{contract.dateSigned ? new Date(contract.dateSigned).toLocaleDateString() : 'N/A'}</div>
+                            {contract.period && (
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                                    {new Date(contract.period.startDate).toLocaleDateString()} - {new Date(contract.period.endDate).toLocaleDateString()}
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <span className="label">Value</span>
+                            <div className="amount">
+                                {formatAmount(contract.value)}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Items - Collapsible */}
+                    <CollapsibleSection title="Items" count={(contract.items || []).length}>
+                        {(contract.items || []).map((item: any, i: number) => (
+                            <div key={i} style={{ fontSize: '0.9rem', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
+                                <div>{item.description}</div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                    Qty: {item.quantity} • {item.unit?.name || 'units'} • {item.classification?.description || ''}
+                                </div>
+                            </div>
+                        ))}
+                    </CollapsibleSection>
+
+                    {/* Milestones - Collapsible */}
+                    <CollapsibleSection title="Milestones" count={(contract.milestones || []).length}>
+                        {(contract.milestones || []).map((m: any, i: number) => (
+                            <div key={i} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', borderLeft: `3px solid ${m.status === 'met' ? 'var(--secondary-color)' : 'var(--text-secondary)'}` }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                                    <span style={{ fontWeight: '500' }}>{m.title}</span>
+                                    <span className="status-badge" style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}>{m.status}</span>
+                                </div>
+                                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>{m.description}</div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                    Type: {m.type} {m.code ? `(${m.code})` : ''}
+                                </div>
+                            </div>
+                        ))}
+                    </CollapsibleSection>
+
+                    {/* Transactions - Collapsible */}
+                    <CollapsibleSection title="Transactions" count={(contract.implementation?.transactions || []).length}>
+                        {(contract.implementation?.transactions || []).map((t: any, i: number) => (
+                            <div key={i} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                    <div style={{ fontSize: '0.9rem' }}>{new Date(t.date).toLocaleDateString()}</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                        {t.payer?.name} → {t.payee?.name}
+                                    </div>
+                                </div>
+                                <div className="amount">{formatAmount(t.value)}</div>
+                            </div>
+                        ))}
+                    </CollapsibleSection>
+
+                    {/* Purchase Orders - Collapsible */}
+                    <CollapsibleSection title="Purchase Orders" count={(contract.implementation?.purchaseOrders || []).length}>
+                        {(contract.implementation?.purchaseOrders || []).map((po: any, i: number) => (
+                            <div key={i} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
+                                <div style={{ fontSize: '0.9rem', fontWeight: '500' }}>{po.title}</div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                    {po.executionPeriod?.startDate ? new Date(po.executionPeriod.startDate).toLocaleDateString() : ''} - {po.executionPeriod?.endDate ? new Date(po.executionPeriod.endDate).toLocaleDateString() : ''}
+                                </div>
+                            </div>
+                        ))}
+                    </CollapsibleSection>
+
+                    {/* Agreed Metrics - Collapsible */}
+                    <CollapsibleSection title="Agreed Metrics" count={(contract.agreedMetrics || []).length}>
+                        {(contract.agreedMetrics || []).map((m: any, i: number) => (
+                            <div key={i} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
+                                <div style={{ fontWeight: '500' }}>{m.title}</div>
+                                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{m.description}</div>
+                            </div>
+                        ))}
+                    </CollapsibleSection>
+                </div>
+            )}
+            <div style={{ textAlign: 'center', marginTop: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                {expanded ? 'Show Less' : 'Show Details'}
+            </div>
+        </div>
     );
 };
 

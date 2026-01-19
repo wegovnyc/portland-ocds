@@ -141,6 +141,65 @@ def get_status_counts(db: Session = Depends(get_db)):
             
     return stats
 
+@app.get("/tenders/stats")
+def get_stats(db: Session = Depends(get_db)):
+    """
+    Get aggregate statistics across all tenders including:
+    - Counts: tenders, contracts, items, milestones, transactions, purchase orders
+    - Total award value
+    - Date range (min/max dates)
+    """
+    stats_sql = text("""
+        SELECT
+            -- Tender count
+            COUNT(DISTINCT t.id) as tender_count,
+            -- Contract count
+            (SELECT COUNT(*) FROM tenders t2, jsonb_array_elements(COALESCE(t2.data->'contracts', '[]'::jsonb)) c) as contract_count,
+            -- Items count (from all contracts)
+            (SELECT COALESCE(SUM(jsonb_array_length(COALESCE(c.value->'items', '[]'::jsonb))), 0) 
+             FROM tenders t2, jsonb_array_elements(COALESCE(t2.data->'contracts', '[]'::jsonb)) c) as item_count,
+            -- Milestones count (from all contracts)
+            (SELECT COALESCE(SUM(jsonb_array_length(COALESCE(c.value->'milestones', '[]'::jsonb))), 0) 
+             FROM tenders t2, jsonb_array_elements(COALESCE(t2.data->'contracts', '[]'::jsonb)) c) as milestone_count,
+            -- Transactions count (from all contracts)
+            (SELECT COALESCE(SUM(jsonb_array_length(COALESCE(c.value->'implementation'->'transactions', '[]'::jsonb))), 0) 
+             FROM tenders t2, jsonb_array_elements(COALESCE(t2.data->'contracts', '[]'::jsonb)) c) as transaction_count,
+            -- Purchase orders count (from all contracts)
+            (SELECT COALESCE(SUM(jsonb_array_length(COALESCE(c.value->'implementation'->'purchaseOrders', '[]'::jsonb))), 0) 
+             FROM tenders t2, jsonb_array_elements(COALESCE(t2.data->'contracts', '[]'::jsonb)) c) as purchase_order_count,
+            -- Total award value (awards have value.amount structure)
+            (SELECT COALESCE(SUM((a.value->'value'->>'amount')::numeric), 0)
+             FROM tenders t2, jsonb_array_elements(COALESCE(t2.data->'awards', '[]'::jsonb)) a
+             WHERE a.value->'value'->>'amount' IS NOT NULL) as total_award_value,
+            -- Min date (earliest tender start date or contract date)
+            (SELECT MIN(LEAST(
+                NULLIF(t2.data->'tender'->'tenderPeriod'->>'startDate', '')::timestamp,
+                NULLIF(t2.data->>'date', '')::timestamp
+            ))
+             FROM tenders t2) as min_date,
+            -- Max date (latest tender end date, modification date, or contract date)
+            (SELECT MAX(GREATEST(
+                COALESCE(NULLIF(t2.data->'tender'->'tenderPeriod'->>'endDate', '')::timestamp, '1900-01-01'::timestamp),
+                COALESCE(NULLIF(t2.data->>'date', '')::timestamp, '1900-01-01'::timestamp)
+            ))
+             FROM tenders t2) as max_date
+        FROM tenders t
+    """)
+    
+    result = db.execute(stats_sql).fetchone()
+    
+    return {
+        "tenders": result[0] or 0,
+        "contracts": result[1] or 0,
+        "items": result[2] or 0,
+        "milestones": result[3] or 0,
+        "transactions": result[4] or 0,
+        "purchaseOrders": result[5] or 0,
+        "totalAwardValue": float(result[6] or 0),
+        "minDate": result[7].isoformat() if result[7] else None,
+        "maxDate": result[8].isoformat() if result[8] else None
+    }
+
 @app.get("/tenders/{tender_id}")
 def get_tender_by_id(tender_id: str, db: Session = Depends(get_db)):
     # Search by OCDS tenderID (which is stored in tender_id column)

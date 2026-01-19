@@ -10,9 +10,9 @@ export default defineConfig({
     allowedHosts: ['portland-ocds.wegov.nyc'],
     proxy: {
       '/api/2.4': {
-        target: 'http://api:8000',
+        target: 'https://portland-ocds.wegov.nyc',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/2.4/, ''),
+        secure: true,
       }
     }
   }
