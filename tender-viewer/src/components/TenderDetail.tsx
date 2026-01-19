@@ -157,46 +157,54 @@ const TenderDetail: React.FC<TenderDetailProps> = ({ id, onClose }) => {
                             </div>
                         </div>
 
-                        <h3 style={{ marginTop: '2rem' }}>Timeline</h3>
-                        <div className="card" style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.03)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                <span className="label">Tender Period Start</span>
-                                <span>{new Date(tender.tenderPeriod?.startDate).toLocaleDateString()}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span className="label">Tender Period End</span>
-                                <span>{new Date(tender.tenderPeriod?.endDate).toLocaleDateString()}</span>
-                            </div>
-                            {tender.enquiryPeriod && (
-                                <>
-                                    <div style={{ margin: '0.5rem 0', borderTop: '1px solid rgba(255,255,255,0.1)' }} />
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                        <span className="label">Enquiry Period Start</span>
-                                        <span>{new Date(tender.enquiryPeriod?.startDate).toLocaleDateString()}</span>
+                        {(tender.tenderPeriod || tender.enquiryPeriod || tender.complaintPeriod) && (
+                            <>
+                                <h3 style={{ marginTop: '2rem' }}>Timeline</h3>
+                                <div className="card" style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.03)' }}>
+                                    {tender.tenderPeriod && (
+                                        <>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                                <span className="label">Tender Period Start</span>
+                                                <span>{tender.tenderPeriod.startDate ? new Date(tender.tenderPeriod.startDate).toLocaleDateString() : 'N/A'}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <span className="label">Tender Period End</span>
+                                                <span>{tender.tenderPeriod.endDate ? new Date(tender.tenderPeriod.endDate).toLocaleDateString() : 'N/A'}</span>
+                                            </div>
+                                        </>
+                                    )}
+                                    {tender.enquiryPeriod && (
+                                        <>
+                                            <div style={{ margin: '0.5rem 0', borderTop: '1px solid rgba(255,255,255,0.1)' }} />
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                                <span className="label">Enquiry Period Start</span>
+                                                <span>{tender.enquiryPeriod.startDate ? new Date(tender.enquiryPeriod.startDate).toLocaleDateString() : 'N/A'}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <span className="label">Enquiry Period End</span>
+                                                <span>{tender.enquiryPeriod.endDate ? new Date(tender.enquiryPeriod.endDate).toLocaleDateString() : 'N/A'}</span>
+                                            </div>
+                                        </>
+                                    )}
+                                    {tender.complaintPeriod && (
+                                        <>
+                                            <div style={{ margin: '0.5rem 0', borderTop: '1px solid rgba(255,255,255,0.1)' }} />
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                                <span className="label">Complaint Period Start</span>
+                                                <span>{tender.complaintPeriod.startDate ? new Date(tender.complaintPeriod.startDate).toLocaleDateString() : 'N/A'}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <span className="label">Complaint Period End</span>
+                                                <span>{tender.complaintPeriod.endDate ? new Date(tender.complaintPeriod.endDate).toLocaleDateString() : 'N/A'}</span>
+                                            </div>
+                                        </>
+                                    )}
+                                    <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'right' }}>
+                                        Last Updated: {tender.dateModified ? new Date(tender.dateModified).toLocaleString() : 'N/A'}
                                     </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <span className="label">Enquiry Period End</span>
-                                        <span>{new Date(tender.enquiryPeriod?.endDate).toLocaleDateString()}</span>
-                                    </div>
-                                </>
-                            )}
-                            {tender.complaintPeriod && (
-                                <>
-                                    <div style={{ margin: '0.5rem 0', borderTop: '1px solid rgba(255,255,255,0.1)' }} />
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                        <span className="label">Complaint Period Start</span>
-                                        <span>{new Date(tender.complaintPeriod?.startDate).toLocaleDateString()}</span>
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <span className="label">Complaint Period End</span>
-                                        <span>{new Date(tender.complaintPeriod?.endDate).toLocaleDateString()}</span>
-                                    </div>
-                                </>
-                            )}
-                            <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'right' }}>
-                                Last Updated: {new Date(tender.dateModified).toLocaleString()}
-                            </div>
-                        </div>
+                                </div>
+                            </>
+                        )}
 
                         {tender.documents && tender.documents.length > 0 && (
                             <>
