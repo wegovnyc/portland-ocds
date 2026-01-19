@@ -1,4 +1,5 @@
 import React from 'react';
+import useSWR from 'swr';
 import { formatAmount } from '../utils';
 
 interface ContractDetailProps {
@@ -18,7 +19,7 @@ const ContractDetail: React.FC<ContractDetailProps> = ({ id, contract: initialCo
     // However, for permalinks we need to fetch if direct access.
 
     const shouldFetch = !!id && !initialContract;
-    const { data, error, isLoading } = useSWR(shouldFetch ? `/api/2.4/contracts/${id}` : null, fetcher);
+    const { data, error: _error, isLoading } = useSWR(shouldFetch ? `/api/2.4/contracts/${id}` : null, fetcher);
 
     // Use passed contract or fetched contract
     const contract = initialContract || (data?.data?.contract);

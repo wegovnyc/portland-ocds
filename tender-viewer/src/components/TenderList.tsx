@@ -167,11 +167,7 @@ const TenderList: React.FC = () => {
     const renderDetailedCard = (item: any) => {
         const tender = item.tender || {};
         const awardCount = (tender.awards || []).length;
-        const contractCount = (item.contracts || []).length; // Contracts are top-level in internal DB structure, but mapped to tender usually. Check API response. Actually API returns .data which is the whole JSON. `contracts` usually at root in OCDS 1.1 records or linked. Let's check tender.contracts fallback.
-        // Our backend stores flattened? No, data column.
-        // API response: data list. Each item is the full JSON.
-        // In OCDS, contracts are at root of Record, but embedded in Tender for Release?
-        // Let's safely check both or assume structure. Main.py sorts by `data->'contracts'`.
+        // Contracts can be at root or in tender object
         const rootContracts = item.contracts || [];
         const tenderContracts = tender.contracts || [];
         const totalContracts = rootContracts.length > 0 ? rootContracts.length : tenderContracts.length;
@@ -354,7 +350,7 @@ const TenderList: React.FC = () => {
                     <option value="all">All Statuses</option>
                     {statusCounts && Object.entries(statusCounts).map(([status, count]) => (
                         <option key={status} value={status}>
-                            {status.charAt(0).toUpperCase() + status.slice(1)} ({count})
+                            {status.charAt(0).toUpperCase() + status.slice(1)} ({String(count)})
                         </option>
                     ))}
                 </select>
@@ -412,11 +408,44 @@ const TenderList: React.FC = () => {
                             >
                                 End Date {getSortIndicator('endDate')}
                             </th>
+                            <th style={{ padding: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                Payment Status
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         {tenders.map((item: any) => {
                             const tender = item.tender || {};
+
+                            // Calculate Payment Health Status
+                            const contracts = item.contracts || [];
+                            let hasTransactions = false;
+                            let hasApprovedMilestones = false;
+                            let hasMilestones = false;
+
+                            contracts.forEach((c: any) => {
+                                const impl = c.implementation || {};
+                                if ((impl.transactions || []).length > 0) hasTransactions = true;
+                                const milestones = c.milestones || [];
+                                if (milestones.length > 0) {
+                                    hasMilestones = true;
+                                    if (milestones.some((m: any) => m.status === 'met')) {
+                                        hasApprovedMilestones = true;
+                                    }
+                                }
+                            });
+
+                            let paymentStatus = { label: '—', color: 'rgba(255,255,255,0.2)', bg: 'rgba(255,255,255,0.05)' };
+                            if (hasTransactions) {
+                                paymentStatus = { label: '💰 Paid', color: '#03dac6', bg: 'rgba(3, 218, 198, 0.15)' };
+                            } else if (hasApprovedMilestones) {
+                                paymentStatus = { label: '✓ Approved', color: '#f4c542', bg: 'rgba(244, 197, 66, 0.15)' };
+                            } else if (hasMilestones) {
+                                paymentStatus = { label: '⏳ Pending', color: '#ff9800', bg: 'rgba(255, 152, 0, 0.15)' };
+                            } else if (contracts.length > 0) {
+                                paymentStatus = { label: '📄 Contract', color: 'var(--text-secondary)', bg: 'rgba(255,255,255,0.05)' };
+                            }
+
                             return (
                                 <tr
                                     key={item.id}
@@ -439,6 +468,17 @@ const TenderList: React.FC = () => {
                                     </td>
                                     <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>
                                         {tender.tenderPeriod?.endDate ? new Date(tender.tenderPeriod.endDate).toLocaleDateString() : '-'}
+                                    </td>
+                                    <td style={{ padding: '1rem' }}>
+                                        <span style={{
+                                            fontSize: '0.75rem',
+                                            padding: '0.2rem 0.5rem',
+                                            borderRadius: '4px',
+                                            background: paymentStatus.bg,
+                                            color: paymentStatus.color
+                                        }}>
+                                            {paymentStatus.label}
+                                        </span>
                                     </td>
                                 </tr>
                             );

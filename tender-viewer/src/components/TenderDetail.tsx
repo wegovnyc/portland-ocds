@@ -376,6 +376,177 @@ const CollapsibleSection = ({ title, count, children }: { title: string, count: 
     );
 };
 
+// Approval Chain Tracker - visualizes the approval workflow
+const APPROVAL_ROLES = [
+    { code: 'CA', title: 'Contract Admin', order: 1 },
+    { code: 'AU', title: 'City Auditor', order: 2 },
+    { code: 'AT', title: 'City Attorney', order: 3 },
+    { code: 'PA', title: 'Purchasing Agent', order: 4 }
+];
+
+const ApprovalChainTracker = ({ milestones }: { milestones: any[] }) => {
+    if (!milestones || milestones.length === 0) return null;
+
+    // Build a map of completed approvals
+    const approvalMap: Record<string, { status: string, date: string }> = {};
+    milestones.forEach(m => {
+        if (m.type === 'approval' && m.code) {
+            approvalMap[m.code] = { status: m.status, date: m.date };
+        }
+    });
+
+    // Check if any approval roles are present in the data
+    const hasAnyApprovalRole = APPROVAL_ROLES.some(role => approvalMap[role.code]);
+    if (!hasAnyApprovalRole) return null;
+
+    return (
+        <div style={{ marginTop: '1rem' }}>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '0.75rem'
+            }}>
+                <span className="label" style={{ margin: 0 }}>Approval Chain</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                    {Object.keys(approvalMap).length} of {APPROVAL_ROLES.length} complete
+                </span>
+            </div>
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+                flexWrap: 'wrap',
+                padding: '0.75rem',
+                background: 'rgba(255,255,255,0.03)',
+                borderRadius: '8px'
+            }}>
+                {APPROVAL_ROLES.map((role, idx) => {
+                    const approval = approvalMap[role.code];
+                    const isMet = approval?.status === 'met';
+
+                    return (
+                        <React.Fragment key={role.code}>
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                flex: '1',
+                                minWidth: '70px'
+                            }}>
+                                <div style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: isMet ? 'rgba(3, 218, 198, 0.2)' : 'rgba(255,255,255,0.05)',
+                                    border: `2px solid ${isMet ? '#03dac6' : 'rgba(255,255,255,0.2)'}`,
+                                    marginBottom: '0.25rem'
+                                }}>
+                                    {isMet ? (
+                                        <span style={{ color: '#03dac6', fontSize: '1rem' }}>✓</span>
+                                    ) : (
+                                        <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}>{role.code}</span>
+                                    )}
+                                </div>
+                                <span style={{
+                                    fontSize: '0.7rem',
+                                    color: isMet ? '#03dac6' : 'var(--text-secondary)',
+                                    textAlign: 'center'
+                                }}>
+                                    {role.title}
+                                </span>
+                                {isMet && approval.date && (
+                                    <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)' }}>
+                                        {new Date(approval.date).toLocaleDateString()}
+                                    </span>
+                                )}
+                            </div>
+                            {idx < APPROVAL_ROLES.length - 1 && (
+                                <div style={{
+                                    width: '20px',
+                                    height: '2px',
+                                    background: isMet && approvalMap[APPROVAL_ROLES[idx + 1]?.code]?.status === 'met'
+                                        ? '#03dac6'
+                                        : 'rgba(255,255,255,0.1)',
+                                    flexShrink: 0
+                                }} />
+                            )}
+                        </React.Fragment>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
+// Transaction Timeline - visual representation of payments over time
+const TransactionTimeline = ({ transactions }: { transactions: any[] }) => {
+    if (!transactions || transactions.length === 0) return null;
+
+    // Sort by date
+    const sorted = [...transactions].sort((a, b) =>
+        new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime()
+    );
+
+    const totalValue = sorted.reduce((sum, t) => sum + (t.value?.amount || 0), 0);
+    const maxValue = Math.max(...sorted.map(t => t.value?.amount || 0));
+
+    return (
+        <div style={{ marginTop: '0.5rem' }}>
+            {/* Summary bar */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '0.5rem',
+                padding: '0.5rem',
+                background: 'rgba(3, 218, 198, 0.1)',
+                borderRadius: '4px'
+            }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    {sorted.length} payments
+                </span>
+                <span style={{ fontSize: '0.9rem', color: '#03dac6', fontWeight: 'bold' }}>
+                    ${totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </span>
+            </div>
+            {/* Mini bar chart */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'flex-end',
+                gap: '2px',
+                height: '40px',
+                padding: '0.25rem 0'
+            }}>
+                {sorted.slice(0, 20).map((t, i) => {
+                    const height = maxValue > 0 ? Math.max(4, (t.value?.amount || 0) / maxValue * 36) : 4;
+                    return (
+                        <div
+                            key={i}
+                            title={`${new Date(t.date).toLocaleDateString()}: $${(t.value?.amount || 0).toLocaleString()}`}
+                            style={{
+                                flex: 1,
+                                height: `${height}px`,
+                                background: 'linear-gradient(to top, #03dac6, #bb86fc)',
+                                borderRadius: '2px 2px 0 0',
+                                opacity: 0.8,
+                                cursor: 'help'
+                            }}
+                        />
+                    );
+                })}
+                {sorted.length > 20 && (
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginLeft: '4px' }}>
+                        +{sorted.length - 20}
+                    </span>
+                )}
+            </div>
+        </div>
+    );
+};
+
 const TenderItem = ({ item }: { item: any }) => {
     return (
         <Card expandedContent={
@@ -522,7 +693,7 @@ const AwardCard = ({ award, contracts = [], showContractNote = false, tenderId, 
     );
 };
 
-const ContractCard = ({ contract, tenderId, isExpanded = false, onShare }: { contract: any, tenderId?: string, isExpanded?: boolean, onShare?: (contractId: string) => void }) => {
+const ContractCard = ({ contract, tenderId, isExpanded = false }: { contract: any, tenderId?: string, isExpanded?: boolean }) => {
     const [expanded, setExpanded] = React.useState(isExpanded);
 
     // Sync with external isExpanded prop (for permalink)
@@ -613,6 +784,9 @@ const ContractCard = ({ contract, tenderId, isExpanded = false, onShare }: { con
                         ))}
                     </CollapsibleSection>
 
+                    {/* Approval Chain Tracker - Visual approval workflow */}
+                    <ApprovalChainTracker milestones={contract.milestones || []} />
+
                     {/* Milestones - Collapsible */}
                     <CollapsibleSection title="Milestones" count={(contract.milestones || []).length}>
                         {(contract.milestones || []).map((m: any, i: number) => (
@@ -628,6 +802,14 @@ const ContractCard = ({ contract, tenderId, isExpanded = false, onShare }: { con
                             </div>
                         ))}
                     </CollapsibleSection>
+
+                    {/* Transaction Timeline - Visual payment history */}
+                    {(contract.implementation?.transactions || []).length > 0 && (
+                        <div style={{ marginTop: '1rem' }}>
+                            <span className="label">Payment History</span>
+                            <TransactionTimeline transactions={contract.implementation?.transactions || []} />
+                        </div>
+                    )}
 
                     {/* Transactions - Collapsible */}
                     <CollapsibleSection title="Transactions" count={(contract.implementation?.transactions || []).length}>
