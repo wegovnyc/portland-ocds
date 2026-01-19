@@ -91,15 +91,24 @@ const TenderList: React.FC = () => {
     const { data: recentData } = useSWR(`/api/2.4/tenders?${recentQuery.toString()}`, fetcher);
     const recentTenders = recentData?.data || [];
 
-    // Fetch Detailed Tenders (Top 3 by complexity)
-    const detailedQuery = new URLSearchParams({
-        limit: '3',
-        sort_by: 'complexity',
-        descending: 'true',
-        min_value: '1'
-    });
-    const { data: detailedData } = useSWR(`/api/2.4/tenders?${detailedQuery.toString()}`, fetcher);
-    const detailedTenders = detailedData?.data || [];
+    // Payment Showcase: Fetch specific tenders with all payment features
+    // These tenders have: transactions, milestones, AND purchase orders
+    const showcaseTenderIds = [
+        'ocds-ptecst-133262',  // TX=40, MS=4, PO=38
+        'ocds-ptecst-133299',  // TX=3, MS=4, PO=3
+        'ocds-ptecst-133238'   // TX=4, MS=4, PO=4
+    ];
+
+    // Fetch each showcase tender individually
+    const { data: showcase1 } = useSWR(`/api/2.4/tenders/${showcaseTenderIds[0]}`, fetcher);
+    const { data: showcase2 } = useSWR(`/api/2.4/tenders/${showcaseTenderIds[1]}`, fetcher);
+    const { data: showcase3 } = useSWR(`/api/2.4/tenders/${showcaseTenderIds[2]}`, fetcher);
+
+    const detailedTenders = [
+        showcase1?.data,
+        showcase2?.data,
+        showcase3?.data
+    ].filter(Boolean);
 
     // Fetch Summary Stats
     const { data: statsData } = useSWR('/api/2.4/tenders/stats', fetcher);
@@ -166,22 +175,32 @@ const TenderList: React.FC = () => {
 
     const renderDetailedCard = (item: any) => {
         const tender = item.tender || {};
-        const awardCount = (tender.awards || []).length;
         // Contracts can be at root or in tender object
-        const rootContracts = item.contracts || [];
-        const tenderContracts = tender.contracts || [];
-        const totalContracts = rootContracts.length > 0 ? rootContracts.length : tenderContracts.length;
+        const contracts = item.contracts || [];
 
-        const docCount = (tender.documents || []).length;
-        const itemCount = (tender.items || []).length;
-        const milestoneCount = (tender.milestones || []).length;
+        // Calculate payment-relevant stats from contracts
+        let transactionCount = 0;
+        let milestoneCount = 0;
+        let totalPaid = 0;
+        contracts.forEach((c: any) => {
+            const impl = c.implementation || {};
+            const txs = impl.transactions || [];
+            transactionCount += txs.length;
+            txs.forEach((t: any) => { totalPaid += t.value?.amount || 0; });
+            milestoneCount += (c.milestones || []).length;
+        });
 
         return (
-            <div key={item.id} className="card" onClick={() => navigate(`/tenders/${item.id}`)} style={{ borderColor: 'rgba(187, 134, 252, 0.3)' }}>
+            <div key={item.id} className="card" onClick={() => navigate(`/tenders/${item.id}`)} style={{ borderColor: 'rgba(3, 218, 198, 0.3)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                     <span className={`status-badge ${tender.status === 'active' ? 'status-active' : 'status-complete'}`}>
                         {tender.status || 'Active'}
                     </span>
+                    {transactionCount > 0 && (
+                        <span style={{ fontSize: '0.9rem', color: '#03dac6', fontWeight: 'bold' }}>
+                            💰 ${totalPaid.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                        </span>
+                    )}
                 </div>
                 <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', lineHeight: '1.4' }}>
                     {formatTitle(tender.title || 'Untitled Tender')}
@@ -191,11 +210,9 @@ const TenderList: React.FC = () => {
                 </p>
 
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: 'auto' }}>
-                    {awardCount > 0 && <span className="status-badge" style={{ background: 'rgba(3, 218, 198, 0.1)', color: '#03dac6', fontSize: '0.75rem' }}>{awardCount} Awards</span>}
-                    {totalContracts > 0 && <span className="status-badge" style={{ background: 'rgba(187, 134, 252, 0.1)', color: '#bb86fc', fontSize: '0.75rem' }}>{totalContracts} Contracts</span>}
-                    {docCount > 0 && <span className="status-badge" style={{ background: 'rgba(255, 255, 255, 0.1)', color: '#fff', fontSize: '0.75rem' }}>{docCount} Docs</span>}
-                    {itemCount > 0 && <span className="status-badge" style={{ background: 'rgba(255, 255, 255, 0.1)', color: '#fff', fontSize: '0.75rem' }}>{itemCount} Items</span>}
-                    {milestoneCount > 0 && <span className="status-badge" style={{ background: 'rgba(255, 255, 255, 0.1)', color: '#fff', fontSize: '0.75rem' }}>{milestoneCount} Milestones</span>}
+                    {contracts.length > 0 && <span className="status-badge" style={{ background: 'rgba(187, 134, 252, 0.1)', color: '#bb86fc', fontSize: '0.75rem' }}>{contracts.length} Contracts</span>}
+                    {transactionCount > 0 && <span className="status-badge" style={{ background: 'rgba(3, 218, 198, 0.15)', color: '#03dac6', fontSize: '0.75rem' }}>💰 {transactionCount} Payments</span>}
+                    {milestoneCount > 0 && <span className="status-badge" style={{ background: 'rgba(244, 197, 66, 0.15)', color: '#f4c542', fontSize: '0.75rem' }}>✓ {milestoneCount} Approvals</span>}
                 </div>
             </div>
         );
@@ -526,13 +543,16 @@ const TenderList: React.FC = () => {
                 </div>
             )}
 
-            {/* Most Detailed Tenders Section (Moved to Bottom) */}
+            {/* Payment Insights Showcase Section */}
             <div style={{ marginBottom: '3rem', marginTop: '4rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', borderLeft: '4px solid #BB86FC', paddingLeft: '1rem' }}>
-                    Most Detailed Tenders
+                <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', borderLeft: '4px solid #03dac6', paddingLeft: '1rem' }}>
+                    💰 Payment Insights Showcase
                 </h2>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', paddingLeft: '1.5rem', fontSize: '0.9rem' }}>
+                    Tenders with approval workflows, payment transactions, and timeline data
+                </p>
                 <div className="tender-grid">
-                    {!detailedData && !detailedTenders.length ? (
+                    {!showcase1 && !detailedTenders.length ? (
                         <>
                             <SkeletonCard />
                             <SkeletonCard />
